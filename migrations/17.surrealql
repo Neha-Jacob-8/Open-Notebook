@@ -1,0 +1,17 @@
+-- Migration 17: Fix source_monitor and update_notification source_id field type
+-- Change from record<source> to string to allow flexibility in source_id storage
+
+-- First, remove the old field definitions and recreate with string type
+REMOVE FIELD IF EXISTS source_id ON TABLE source_monitor;
+DEFINE FIELD source_id ON TABLE source_monitor TYPE string;
+
+-- Also fix update_notification table which had the same issue
+REMOVE FIELD IF EXISTS source_id ON TABLE update_notification;
+DEFINE FIELD source_id ON TABLE update_notification TYPE string;
+
+-- Recreate indexes
+REMOVE INDEX IF EXISTS source_monitor_source_idx ON TABLE source_monitor;
+DEFINE INDEX source_monitor_source_idx ON TABLE source_monitor FIELDS source_id UNIQUE;
+
+REMOVE INDEX IF EXISTS notification_source_idx ON TABLE update_notification;
+DEFINE INDEX notification_source_idx ON TABLE update_notification FIELDS source_id;

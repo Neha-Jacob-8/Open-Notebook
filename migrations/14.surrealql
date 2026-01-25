@@ -1,0 +1,64 @@
+-- Migration 14: Study Plan Generator
+-- AI-generated personalized study schedules
+
+-- Study plan table
+DEFINE TABLE study_plan SCHEMAFULL;
+DEFINE FIELD notebook_id ON study_plan TYPE string;
+DEFINE FIELD title ON study_plan TYPE string;
+DEFINE FIELD description ON study_plan TYPE option<string>;
+DEFINE FIELD deadline ON study_plan TYPE datetime;
+DEFINE FIELD available_hours_per_day ON study_plan TYPE float DEFAULT 2.0;
+DEFINE FIELD total_study_hours ON study_plan TYPE float;
+DEFINE FIELD status ON study_plan TYPE string DEFAULT 'active'; -- active, completed, paused, cancelled
+DEFINE FIELD progress_percentage ON study_plan TYPE float DEFAULT 0.0;
+DEFINE FIELD created_at ON study_plan TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated_at ON study_plan TYPE datetime DEFAULT time::now();
+DEFINE INDEX idx_study_plan_notebook ON study_plan FIELDS notebook_id;
+DEFINE INDEX idx_study_plan_status ON study_plan FIELDS status;
+DEFINE INDEX idx_study_plan_deadline ON study_plan FIELDS deadline;
+
+-- Study topic (extracted from sources)
+DEFINE TABLE study_topic SCHEMAFULL;
+DEFINE FIELD plan_id ON study_topic TYPE string;
+DEFINE FIELD name ON study_topic TYPE string;
+DEFINE FIELD description ON study_topic TYPE option<string>;
+DEFINE FIELD difficulty ON study_topic TYPE string DEFAULT 'medium'; -- easy, medium, hard
+DEFINE FIELD estimated_hours ON study_topic TYPE float;
+DEFINE FIELD priority ON study_topic TYPE int DEFAULT 5; -- 1-10, higher = more important
+DEFINE FIELD source_ids ON study_topic TYPE array DEFAULT [];
+DEFINE FIELD prerequisites ON study_topic TYPE array DEFAULT []; -- topic IDs
+DEFINE FIELD status ON study_topic TYPE string DEFAULT 'not_started'; -- not_started, in_progress, completed, skipped
+DEFINE FIELD mastery_level ON study_topic TYPE float DEFAULT 0.0; -- 0-100
+DEFINE FIELD created_at ON study_topic TYPE datetime DEFAULT time::now();
+DEFINE INDEX idx_study_topic_plan ON study_topic FIELDS plan_id;
+DEFINE INDEX idx_study_topic_status ON study_topic FIELDS status;
+
+-- Study session (individual study blocks)
+DEFINE TABLE study_session SCHEMAFULL;
+DEFINE FIELD plan_id ON study_session TYPE string;
+DEFINE FIELD topic_id ON study_session TYPE string;
+DEFINE FIELD scheduled_date ON study_session TYPE datetime;
+DEFINE FIELD scheduled_duration_minutes ON study_session TYPE int;
+DEFINE FIELD actual_start ON study_session TYPE option<datetime>;
+DEFINE FIELD actual_end ON study_session TYPE option<datetime>;
+DEFINE FIELD session_type ON study_session TYPE string DEFAULT 'learn'; -- learn, review, practice, quiz
+DEFINE FIELD status ON study_session TYPE string DEFAULT 'scheduled'; -- scheduled, in_progress, completed, skipped, rescheduled
+DEFINE FIELD notes ON study_session TYPE option<string>;
+DEFINE FIELD rating ON study_session TYPE option<int>; -- 1-5 self-assessment
+DEFINE FIELD created_at ON study_session TYPE datetime DEFAULT time::now();
+DEFINE INDEX idx_study_session_plan ON study_session FIELDS plan_id;
+DEFINE INDEX idx_study_session_topic ON study_session FIELDS topic_id;
+DEFINE INDEX idx_study_session_date ON study_session FIELDS scheduled_date;
+DEFINE INDEX idx_study_session_status ON study_session FIELDS status;
+
+-- Study plan adjustments (AI suggestions for plan changes)
+DEFINE TABLE plan_adjustment SCHEMAFULL;
+DEFINE FIELD plan_id ON plan_adjustment TYPE string;
+DEFINE FIELD adjustment_type ON plan_adjustment TYPE string; -- reschedule, add_review, extend_deadline, increase_hours
+DEFINE FIELD reason ON plan_adjustment TYPE string;
+DEFINE FIELD original_value ON plan_adjustment TYPE option<string>;
+DEFINE FIELD suggested_value ON plan_adjustment TYPE option<string>;
+DEFINE FIELD status ON plan_adjustment TYPE string DEFAULT 'pending'; -- pending, accepted, rejected
+DEFINE FIELD created_at ON plan_adjustment TYPE datetime DEFAULT time::now();
+DEFINE INDEX idx_plan_adjustment_plan ON plan_adjustment FIELDS plan_id;
+DEFINE INDEX idx_plan_adjustment_status ON plan_adjustment FIELDS status;

@@ -1,0 +1,49 @@
+-- Migration 12: Knowledge Graph Tables
+-- Creates tables for concept nodes and edges
+
+-- Concept nodes extracted from sources
+DEFINE TABLE IF NOT EXISTS concept_node SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS label ON concept_node TYPE string;
+DEFINE FIELD IF NOT EXISTS type ON concept_node TYPE string DEFAULT 'concept'; -- concept, person, event, place, organization
+DEFINE FIELD IF NOT EXISTS description ON concept_node TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS source_ids ON concept_node TYPE array DEFAULT [];
+DEFINE FIELD IF NOT EXISTS notebook_id ON concept_node TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS embedding ON concept_node TYPE option<array>;
+DEFINE FIELD IF NOT EXISTS importance ON concept_node TYPE float DEFAULT 0.5; -- 0-1 scale
+DEFINE FIELD IF NOT EXISTS mentions ON concept_node TYPE int DEFAULT 1;
+DEFINE FIELD IF NOT EXISTS created ON concept_node TYPE datetime DEFAULT time::now();
+DEFINE FIELD IF NOT EXISTS updated ON concept_node TYPE datetime DEFAULT time::now();
+
+-- Indexes for concept nodes
+DEFINE INDEX IF NOT EXISTS idx_concept_notebook ON concept_node FIELDS notebook_id;
+DEFINE INDEX IF NOT EXISTS idx_concept_label ON concept_node FIELDS label;
+DEFINE INDEX IF NOT EXISTS idx_concept_type ON concept_node FIELDS type;
+
+-- Concept edges (relationships between concepts)
+DEFINE TABLE IF NOT EXISTS concept_edge SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS source_node ON concept_edge TYPE string; -- concept_node ID
+DEFINE FIELD IF NOT EXISTS target_node ON concept_edge TYPE string; -- concept_node ID
+DEFINE FIELD IF NOT EXISTS relationship ON concept_edge TYPE string; -- is_a, part_of, causes, related_to, etc.
+DEFINE FIELD IF NOT EXISTS description ON concept_edge TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS weight ON concept_edge TYPE float DEFAULT 1.0;
+DEFINE FIELD IF NOT EXISTS source_ids ON concept_edge TYPE array DEFAULT [];
+DEFINE FIELD IF NOT EXISTS notebook_id ON concept_edge TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS created ON concept_edge TYPE datetime DEFAULT time::now();
+
+-- Indexes for concept edges
+DEFINE INDEX IF NOT EXISTS idx_edge_source ON concept_edge FIELDS source_node;
+DEFINE INDEX IF NOT EXISTS idx_edge_target ON concept_edge FIELDS target_node;
+DEFINE INDEX IF NOT EXISTS idx_edge_notebook ON concept_edge FIELDS notebook_id;
+
+-- Knowledge graph metadata (tracks when graphs were built)
+DEFINE TABLE IF NOT EXISTS knowledge_graph_meta SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS notebook_id ON knowledge_graph_meta TYPE string;
+DEFINE FIELD IF NOT EXISTS node_count ON knowledge_graph_meta TYPE int DEFAULT 0;
+DEFINE FIELD IF NOT EXISTS edge_count ON knowledge_graph_meta TYPE int DEFAULT 0;
+DEFINE FIELD IF NOT EXISTS last_built ON knowledge_graph_meta TYPE datetime;
+DEFINE FIELD IF NOT EXISTS build_status ON knowledge_graph_meta TYPE string DEFAULT 'pending'; -- pending, building, completed, error
+DEFINE FIELD IF NOT EXISTS error_message ON knowledge_graph_meta TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS created ON knowledge_graph_meta TYPE datetime DEFAULT time::now();
+DEFINE FIELD IF NOT EXISTS updated ON knowledge_graph_meta TYPE datetime DEFAULT time::now();
+
+DEFINE INDEX IF NOT EXISTS idx_kg_meta_notebook ON knowledge_graph_meta FIELDS notebook_id UNIQUE;

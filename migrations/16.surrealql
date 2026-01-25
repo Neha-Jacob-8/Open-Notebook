@@ -1,0 +1,79 @@
+-- Migration 16: Novel Feature Tables
+-- Creates tables for knowledge graph, study plans, source updates, and research
+
+-- =====================================================
+-- Knowledge Graph Tables
+-- =====================================================
+
+-- Concept nodes in the knowledge graph
+DEFINE TABLE concept_node SCHEMALESS;
+DEFINE FIELD created ON concept_node DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON concept_node DEFAULT time::now() VALUE time::now();
+DEFINE INDEX concept_node_notebook_idx ON concept_node FIELDS notebook_id;
+DEFINE INDEX concept_node_label_idx ON concept_node FIELDS label;
+
+-- Edges/relationships between concept nodes
+DEFINE TABLE concept_edge SCHEMALESS;
+DEFINE FIELD created ON concept_edge DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON concept_edge DEFAULT time::now() VALUE time::now();
+DEFINE INDEX concept_edge_notebook_idx ON concept_edge FIELDS notebook_id;
+DEFINE INDEX concept_edge_source_idx ON concept_edge FIELDS source_node;
+DEFINE INDEX concept_edge_target_idx ON concept_edge FIELDS target_node;
+
+-- Metadata about a notebook's knowledge graph
+DEFINE TABLE knowledge_graph_meta SCHEMALESS;
+DEFINE FIELD created ON knowledge_graph_meta DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON knowledge_graph_meta DEFAULT time::now() VALUE time::now();
+DEFINE INDEX knowledge_graph_meta_notebook_idx ON knowledge_graph_meta FIELDS notebook_id;
+
+-- =====================================================
+-- Study Plan Tables
+-- =====================================================
+
+-- Study plans
+DEFINE TABLE study_plan SCHEMALESS;
+DEFINE FIELD created_at ON study_plan DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated_at ON study_plan DEFAULT time::now() VALUE time::now();
+DEFINE INDEX study_plan_notebook_idx ON study_plan FIELDS notebook_id;
+
+-- Study topics within a plan
+DEFINE TABLE study_topic SCHEMALESS;
+DEFINE FIELD created_at ON study_topic DEFAULT time::now() VALUE $before OR time::now();
+DEFINE INDEX study_topic_plan_idx ON study_topic FIELDS plan_id;
+
+-- Study sessions
+DEFINE TABLE study_session SCHEMALESS;
+DEFINE FIELD created_at ON study_session DEFAULT time::now() VALUE $before OR time::now();
+DEFINE INDEX study_session_plan_idx ON study_session FIELDS plan_id;
+DEFINE INDEX study_session_topic_idx ON study_session FIELDS topic_id;
+DEFINE INDEX study_session_date_idx ON study_session FIELDS scheduled_date;
+
+-- Plan adjustments/suggestions
+DEFINE TABLE plan_adjustment SCHEMALESS;
+DEFINE FIELD created_at ON plan_adjustment DEFAULT time::now() VALUE $before OR time::now();
+DEFINE INDEX plan_adjustment_plan_idx ON plan_adjustment FIELDS plan_id;
+
+-- =====================================================
+-- Source Update Tables
+-- =====================================================
+
+-- Tracked source updates
+DEFINE TABLE source_update SCHEMALESS;
+DEFINE FIELD created ON source_update DEFAULT time::now() VALUE $before OR time::now();
+DEFINE INDEX source_update_source_idx ON source_update FIELDS source_id;
+DEFINE INDEX source_update_status_idx ON source_update FIELDS status;
+
+-- Update job status
+DEFINE TABLE update_job SCHEMALESS;
+DEFINE FIELD created ON update_job DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON update_job DEFAULT time::now() VALUE time::now();
+
+-- =====================================================
+-- Research Tables
+-- =====================================================
+
+-- Research sessions
+DEFINE TABLE research_session SCHEMALESS;
+DEFINE FIELD created ON research_session DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON research_session DEFAULT time::now() VALUE time::now();
+DEFINE INDEX research_session_notebook_idx ON research_session FIELDS notebook_id;

@@ -1,0 +1,8 @@
+-- Migration 17 down: Revert source_id field type changes
+-- Note: This will cause data loss if there are existing records with string source_ids
+
+REMOVE FIELD IF EXISTS source_id ON TABLE source_monitor;
+DEFINE FIELD source_id ON TABLE source_monitor TYPE record<source>;
+
+REMOVE FIELD IF EXISTS source_id ON TABLE update_notification;
+DEFINE FIELD source_id ON TABLE update_notification TYPE record<source>;

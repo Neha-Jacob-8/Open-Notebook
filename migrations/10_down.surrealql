@@ -1,0 +1,5 @@
+-- Migration 10 Down: Remove Quiz and Flashcard tables
+
+REMOVE TABLE flashcard;
+REMOVE TABLE quiz_question;
+REMOVE TABLE quiz_session;

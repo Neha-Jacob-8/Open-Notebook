@@ -1,0 +1,29 @@
+-- Migration 10: Quiz and Flashcard System
+-- Using SCHEMALESS to match domain models flexibly
+
+-- Flashcard table with FSRS spaced repetition fields
+DEFINE TABLE flashcard SCHEMALESS;
+DEFINE FIELD created ON flashcard DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON flashcard DEFAULT time::now() VALUE time::now();
+
+-- Quiz Question table  
+DEFINE TABLE quiz_question SCHEMALESS;
+DEFINE FIELD created ON quiz_question DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON quiz_question DEFAULT time::now() VALUE time::now();
+
+-- Quiz Session table
+DEFINE TABLE quiz_session SCHEMALESS;
+DEFINE FIELD created ON quiz_session DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON quiz_session DEFAULT time::now() VALUE time::now();
+
+-- User Study Stats table for gamification
+DEFINE TABLE user_study_stats SCHEMALESS;
+DEFINE FIELD created ON user_study_stats DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON user_study_stats DEFAULT time::now() VALUE time::now();
+
+-- Indexes for efficient queries
+DEFINE INDEX IF NOT EXISTS flashcard_due_idx ON flashcard FIELDS due;
+DEFINE INDEX IF NOT EXISTS flashcard_state_idx ON flashcard FIELDS state;
+DEFINE INDEX IF NOT EXISTS flashcard_notebook_idx ON flashcard FIELDS notebook_id;
+DEFINE INDEX IF NOT EXISTS quiz_session_notebook_idx ON quiz_session FIELDS notebook_id;
+DEFINE INDEX IF NOT EXISTS quiz_question_session_idx ON quiz_question FIELDS quiz_session_id;

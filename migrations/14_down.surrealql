@@ -1,0 +1,6 @@
+-- Migration 14 Down: Remove Study Plan Generator tables
+
+REMOVE TABLE IF EXISTS plan_adjustment;
+REMOVE TABLE IF EXISTS study_session;
+REMOVE TABLE IF EXISTS study_topic;
+REMOVE TABLE IF EXISTS study_plan;

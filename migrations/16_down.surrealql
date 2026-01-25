@@ -1,0 +1,12 @@
+-- Migration 16 Down: Remove novel feature tables
+
+REMOVE TABLE IF EXISTS concept_node;
+REMOVE TABLE IF EXISTS concept_edge;
+REMOVE TABLE IF EXISTS knowledge_graph_meta;
+REMOVE TABLE IF EXISTS study_plan;
+REMOVE TABLE IF EXISTS study_topic;
+REMOVE TABLE IF EXISTS study_session;
+REMOVE TABLE IF EXISTS plan_adjustment;
+REMOVE TABLE IF EXISTS source_update;
+REMOVE TABLE IF EXISTS update_job;
+REMOVE TABLE IF EXISTS research_session;

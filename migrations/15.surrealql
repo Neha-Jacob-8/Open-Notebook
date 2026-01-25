@@ -1,0 +1,30 @@
+-- Migration 15: Fix Quiz/Flashcard tables to use SCHEMALESS format
+-- This fixes the schema mismatch between domain models and database tables
+
+-- Drop old schema-full tables
+REMOVE TABLE IF EXISTS flashcard;
+REMOVE TABLE IF EXISTS quiz_question;
+REMOVE TABLE IF EXISTS quiz_session;
+REMOVE TABLE IF EXISTS user_study_stats;
+
+-- Recreate as SCHEMALESS to match domain models
+DEFINE TABLE flashcard SCHEMALESS;
+DEFINE FIELD created ON flashcard DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON flashcard DEFAULT time::now() VALUE time::now();
+
+DEFINE TABLE quiz_question SCHEMALESS;
+DEFINE FIELD created ON quiz_question DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON quiz_question DEFAULT time::now() VALUE time::now();
+
+DEFINE TABLE quiz_session SCHEMALESS;
+DEFINE FIELD created ON quiz_session DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON quiz_session DEFAULT time::now() VALUE time::now();
+
+DEFINE TABLE user_study_stats SCHEMALESS;
+DEFINE FIELD created ON user_study_stats DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD updated ON user_study_stats DEFAULT time::now() VALUE time::now();
+
+-- Indexes
+DEFINE INDEX IF NOT EXISTS flashcard_notebook_idx ON flashcard FIELDS notebook_id;
+DEFINE INDEX IF NOT EXISTS quiz_session_notebook_idx ON quiz_session FIELDS notebook_id;
+DEFINE INDEX IF NOT EXISTS quiz_question_session_idx ON quiz_question FIELDS quiz_session_id;

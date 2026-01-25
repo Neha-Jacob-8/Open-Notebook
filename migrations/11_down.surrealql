@@ -1,0 +1,6 @@
+-- Migration 11 Down: Remove Quiz and Flashcard System
+
+REMOVE TABLE flashcard;
+REMOVE TABLE quiz_session;
+REMOVE TABLE quiz_question;
+REMOVE TABLE user_study_stats;

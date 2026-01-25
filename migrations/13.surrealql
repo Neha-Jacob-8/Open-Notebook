@@ -1,0 +1,48 @@
+-- Migration 13: Auto-Update Agent - Source Monitoring & Notifications
+
+-- Table for tracking monitored sources
+DEFINE TABLE source_monitor SCHEMAFULL;
+
+DEFINE FIELD source_id ON TABLE source_monitor TYPE record<source>;
+DEFINE FIELD enabled ON TABLE source_monitor TYPE bool DEFAULT true;
+DEFINE FIELD check_frequency ON TABLE source_monitor TYPE string DEFAULT 'daily'; -- hourly, daily, weekly
+DEFINE FIELD last_checked_at ON TABLE source_monitor TYPE option<datetime>;
+DEFINE FIELD last_content_hash ON TABLE source_monitor TYPE option<string>;
+DEFINE FIELD consecutive_failures ON TABLE source_monitor TYPE int DEFAULT 0;
+DEFINE FIELD created_at ON TABLE source_monitor TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated_at ON TABLE source_monitor TYPE datetime DEFAULT time::now();
+
+DEFINE INDEX source_monitor_source_idx ON TABLE source_monitor FIELDS source_id UNIQUE;
+DEFINE INDEX source_monitor_enabled_idx ON TABLE source_monitor FIELDS enabled;
+
+-- Table for update notifications
+DEFINE TABLE update_notification SCHEMAFULL;
+
+DEFINE FIELD source_id ON TABLE source_monitor TYPE record<source>;
+DEFINE FIELD source_title ON TABLE update_notification TYPE string;
+DEFINE FIELD change_summary ON TABLE update_notification TYPE string;
+DEFINE FIELD diff_highlights ON TABLE update_notification TYPE array;
+DEFINE FIELD old_content_preview ON TABLE update_notification TYPE option<string>;
+DEFINE FIELD new_content_preview ON TABLE update_notification TYPE option<string>;
+DEFINE FIELD severity ON TABLE update_notification TYPE string DEFAULT 'info'; -- info, warning, critical
+DEFINE FIELD is_read ON TABLE update_notification TYPE bool DEFAULT false;
+DEFINE FIELD is_dismissed ON TABLE update_notification TYPE bool DEFAULT false;
+DEFINE FIELD created_at ON TABLE update_notification TYPE datetime DEFAULT time::now();
+
+DEFINE INDEX notification_source_idx ON TABLE update_notification FIELDS source_id;
+DEFINE INDEX notification_read_idx ON TABLE update_notification FIELDS is_read;
+DEFINE INDEX notification_dismissed_idx ON TABLE update_notification FIELDS is_dismissed;
+DEFINE INDEX notification_created_idx ON TABLE update_notification FIELDS created_at;
+
+-- Table for monitoring job history
+DEFINE TABLE monitor_job_run SCHEMAFULL;
+
+DEFINE FIELD started_at ON TABLE monitor_job_run TYPE datetime DEFAULT time::now();
+DEFINE FIELD completed_at ON TABLE monitor_job_run TYPE option<datetime>;
+DEFINE FIELD status ON TABLE monitor_job_run TYPE string DEFAULT 'running'; -- running, completed, failed
+DEFINE FIELD sources_checked ON TABLE monitor_job_run TYPE int DEFAULT 0;
+DEFINE FIELD updates_found ON TABLE monitor_job_run TYPE int DEFAULT 0;
+DEFINE FIELD errors ON TABLE monitor_job_run TYPE array DEFAULT [];
+
+DEFINE INDEX job_run_status_idx ON TABLE monitor_job_run FIELDS status;
+DEFINE INDEX job_run_started_idx ON TABLE monitor_job_run FIELDS started_at;

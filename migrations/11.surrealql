@@ -1,0 +1,75 @@
+-- Migration 11: Quiz and Flashcard System with FSRS Spaced Repetition
+
+-- Flashcard table with FSRS scheduling fields
+DEFINE TABLE flashcard SCHEMAFULL;
+DEFINE FIELD user_id ON flashcard TYPE option<string>;
+DEFINE FIELD source_id ON flashcard TYPE option<string>;
+DEFINE FIELD notebook_id ON flashcard TYPE option<string>;
+DEFINE FIELD front ON flashcard TYPE string;
+DEFINE FIELD back ON flashcard TYPE string;
+DEFINE FIELD tags ON flashcard TYPE option<array<string>>;
+-- FSRS scheduling fields
+DEFINE FIELD stability ON flashcard TYPE float DEFAULT 0;
+DEFINE FIELD difficulty ON flashcard TYPE float DEFAULT 0;
+DEFINE FIELD elapsed_days ON flashcard TYPE int DEFAULT 0;
+DEFINE FIELD scheduled_days ON flashcard TYPE int DEFAULT 0;
+DEFINE FIELD reps ON flashcard TYPE int DEFAULT 0;
+DEFINE FIELD lapses ON flashcard TYPE int DEFAULT 0;
+DEFINE FIELD state ON flashcard TYPE int DEFAULT 0;
+DEFINE FIELD due ON flashcard TYPE option<datetime>;
+DEFINE FIELD last_review ON flashcard TYPE option<datetime>;
+DEFINE FIELD created ON flashcard TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated ON flashcard TYPE datetime DEFAULT time::now();
+DEFINE INDEX flashcard_due_idx ON flashcard FIELDS due;
+DEFINE INDEX flashcard_notebook_idx ON flashcard FIELDS notebook_id;
+DEFINE INDEX flashcard_source_idx ON flashcard FIELDS source_id;
+
+-- Quiz session table
+DEFINE TABLE quiz_session SCHEMAFULL;
+DEFINE FIELD notebook_id ON quiz_session TYPE string;
+DEFINE FIELD title ON quiz_session TYPE option<string>;
+DEFINE FIELD question_count ON quiz_session TYPE int DEFAULT 0;
+DEFINE FIELD correct_count ON quiz_session TYPE int DEFAULT 0;
+DEFINE FIELD score ON quiz_session TYPE option<float>;
+DEFINE FIELD difficulty ON quiz_session TYPE string DEFAULT "mixed";
+DEFINE FIELD status ON quiz_session TYPE string DEFAULT "in_progress";
+DEFINE FIELD started_at ON quiz_session TYPE datetime DEFAULT time::now();
+DEFINE FIELD completed_at ON quiz_session TYPE option<datetime>;
+DEFINE FIELD created ON quiz_session TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated ON quiz_session TYPE datetime DEFAULT time::now();
+DEFINE INDEX quiz_session_notebook_idx ON quiz_session FIELDS notebook_id;
+DEFINE INDEX quiz_session_status_idx ON quiz_session FIELDS status;
+
+-- Quiz question table
+DEFINE TABLE quiz_question SCHEMAFULL;
+DEFINE FIELD quiz_session_id ON quiz_question TYPE string;
+DEFINE FIELD source_id ON quiz_question TYPE option<string>;
+DEFINE FIELD question ON quiz_question TYPE string;
+DEFINE FIELD question_type ON quiz_question TYPE string DEFAULT "mcq";
+DEFINE FIELD options ON quiz_question TYPE array<string>;
+DEFINE FIELD correct_index ON quiz_question TYPE int;
+DEFINE FIELD explanation ON quiz_question TYPE string;
+DEFINE FIELD difficulty ON quiz_question TYPE string DEFAULT "medium";
+DEFINE FIELD user_answer ON quiz_question TYPE option<int>;
+DEFINE FIELD is_correct ON quiz_question TYPE option<bool>;
+DEFINE FIELD answered_at ON quiz_question TYPE option<datetime>;
+DEFINE FIELD time_spent_seconds ON quiz_question TYPE option<int>;
+DEFINE FIELD created ON quiz_question TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated ON quiz_question TYPE datetime DEFAULT time::now();
+DEFINE INDEX quiz_question_session_idx ON quiz_question FIELDS quiz_session_id;
+
+-- User study stats for gamification
+DEFINE TABLE user_study_stats SCHEMAFULL;
+DEFINE FIELD user_id ON user_study_stats TYPE string;
+DEFINE FIELD current_streak ON user_study_stats TYPE int DEFAULT 0;
+DEFINE FIELD longest_streak ON user_study_stats TYPE int DEFAULT 0;
+DEFINE FIELD total_xp ON user_study_stats TYPE int DEFAULT 0;
+DEFINE FIELD level ON user_study_stats TYPE int DEFAULT 1;
+DEFINE FIELD badges ON user_study_stats TYPE array<string> DEFAULT [];
+DEFINE FIELD last_study_date ON user_study_stats TYPE option<datetime>;
+DEFINE FIELD total_quizzes_completed ON user_study_stats TYPE int DEFAULT 0;
+DEFINE FIELD total_flashcards_reviewed ON user_study_stats TYPE int DEFAULT 0;
+DEFINE FIELD total_correct_answers ON user_study_stats TYPE int DEFAULT 0;
+DEFINE FIELD created ON user_study_stats TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated ON user_study_stats TYPE datetime DEFAULT time::now();
+DEFINE INDEX user_study_stats_user_idx ON user_study_stats FIELDS user_id;

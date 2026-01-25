@@ -1,0 +1,2 @@
+-- Migration 15 Down: Reverse the table recreation (no-op for down since we can't restore old data)
+-- Tables remain as SCHEMALESS
