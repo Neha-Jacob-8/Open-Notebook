@@ -1,0 +1,75 @@
+# Railway Build Optimization - Ignore unnecessary files
+
+# Development
+.git/
+.github/
+.vscode/
+*.md
+!RAILWAY.md
+!README.md
+docs/
+.env.example
+.env.railway
+.gitignore
+
+# Data directories (will be empty in repo anyway)
+data/
+notebook_data/
+surreal_data/
+surreal_single_data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+.next/
+.turbo/
+out/
+build/
+dist/
+
+# IDEs
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Scripts not needed in production
+start-dev.ps1
+start-production.ps1
+stop-services.ps1
+diagnose.ps1
+Makefile
+
+# Alternative docker files
+Dockerfile
+Dockerfile.single
+docker-compose*.yml
+supervisord.conf
+supervisord.single.conf
+
+# Tests
+tests/
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+
+# CI/CD
+.gitlab-ci.yml
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

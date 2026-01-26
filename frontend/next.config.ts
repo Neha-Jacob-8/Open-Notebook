@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable standalone output for optimized Docker deployment
-  output: "standalone",
+  // Disable standalone for Railway deployment
+  // Railway works better with standard Next.js build
+  // output: "standalone",
 
   // Ignore lint/type errors during build for faster production build
   eslint: {

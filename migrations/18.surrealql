@@ -1,0 +1,9 @@
+-- Migration 18: Ensure FREE tier models are configured
+-- This migration doesn't change podcast settings (user will configure later)
+-- Just ensures the system is ready for Groq + Gemini usage
+
+-- Note: Podcast models will remain as originally configured
+-- User will update podcast settings later when needed
+
+-- This is a placeholder migration to track version
+-- Actual model selection happens in the UI via model defaults
