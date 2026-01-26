@@ -74,7 +74,16 @@ COPY --from=builder /app/frontend/.next/standalone /app/frontend/
 COPY --from=builder /app/frontend/.next/static /app/frontend/.next/static
 COPY --from=builder /app/frontend/public /app/frontend/public
 
-# Create directories for data persistence
+# Default PORT if not provided
+ENV PORT=8502
+
+# Expose ports for Frontend and API
+EXPOSE 8502 5055
+
+# Copy single-container supervisord configuration
+COPY supervisord.single.conf /app/supervisord.conf
+
+# Create log directories
 RUN mkdir -p /var/log/supervisor
 
 # Runtime API URL Configuration
@@ -87,4 +96,4 @@ RUN mkdir -p /var/log/supervisor
 #
 # Example: docker run -e API_URL=https://your-domain.com/api ...
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/app/supervisord.conf"]

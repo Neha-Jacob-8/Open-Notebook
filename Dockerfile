@@ -84,7 +84,7 @@ COPY scripts/wait-for-api.sh /app/scripts/wait-for-api.sh
 RUN chmod +x /app/scripts/wait-for-api.sh
 
 # Copy supervisord configuration
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /app/supervisord.conf
 
 # Create log directories
 RUN mkdir -p /var/log/supervisor
@@ -99,4 +99,4 @@ RUN mkdir -p /var/log/supervisor
 #
 # Example: docker run -e API_URL=https://your-domain.com/api ...
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/app/supervisord.conf"]
