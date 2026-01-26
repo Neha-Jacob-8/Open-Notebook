@@ -7,6 +7,7 @@ MAX_RETRIES=60  # 60 retries * 5 seconds = 5 minutes max wait
 RETRY_INTERVAL=5
 
 echo "Waiting for API to be ready at ${API_URL}/health..." >&2
+echo "Frontend will start on PORT=${PORT}" >&2
 
 for i in $(seq 1 $MAX_RETRIES); do
     if curl -s -f "${API_URL}/health" > /dev/null 2>&1; then
