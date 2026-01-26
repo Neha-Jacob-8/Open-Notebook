@@ -66,10 +66,7 @@ COPY --from=builder /app/.venv /app/.venv
 # Copy the application code
 COPY --from=builder /app /app
 
-# Copy built frontend from builder stage
-COPY --from=builder /app/frontend/.next/standalone /app/frontend/
-COPY --from=builder /app/frontend/.next/static /app/frontend/.next/static
-COPY --from=builder /app/frontend/public /app/frontend/public
+# Frontend build is already included in COPY --from=builder /app /app
 
 # Default PORT if not provided
 ENV PORT=8502

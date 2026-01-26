@@ -63,22 +63,6 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Set the working directory in the container to /app
 WORKDIR /app
 
-# Copy the virtual environment from builder stage
-COPY --from=builder /app/.venv /app/.venv
-
-# Copy the application code
-COPY --from=builder /app /app
-
-# Copy built frontend from builder stage
-COPY --from=builder /app/frontend/.next/standalone /app/frontend/
-COPY --from=builder /app/frontend/.next/static /app/frontend/.next/static
-COPY --from=builder /app/frontend/public /app/frontend/public
-
-# where the frontend should connect to the API. This allows the same Docker image
-# to work in different deployment scenarios without rebuilding.
-#
-# If not set, the system will auto-detect based on incoming requests.
-# Set API_URL when using reverse proxies or custom domains.
 #
 # Example: docker run -e API_URL=https://your-domain.com/api ...
 
