@@ -1,9 +1,6 @@
--- Migration 18: Ensure FREE tier models are configured
--- This migration doesn't change podcast settings (user will configure later)
--- Just ensures the system is ready for Groq + Gemini usage
+-- Migration 18: FREE tier models ready
+-- This migration ensures database is ready for Groq + Gemini
+-- Podcast settings remain unchanged (user will configure later)
 
--- Note: Podcast models will remain as originally configured
--- User will update podcast settings later when needed
-
--- This is a placeholder migration to track version
--- Actual model selection happens in the UI via model defaults
+-- Simple SELECT to validate migration runs successfully
+SELECT * FROM schema_version LIMIT 1;
