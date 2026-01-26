@@ -1,0 +1,36 @@
+app:
+  name: open-notebook
+  services:
+    - name: web
+      type: web
+      dockerfile: Dockerfile.railway
+      ports:
+        - port: 8080
+          protocol: http
+      env:
+        - name: SURREAL_URL
+          value: ws://127.0.0.1:8000/rpc
+        - name: SURREAL_USER
+          value: root
+        - name: SURREAL_PASSWORD
+          value: root
+        - name: SURREAL_NAMESPACE
+          value: test
+        - name: SURREAL_DATABASE
+          value: test
+        - name: INTERNAL_API_URL
+          value: http://127.0.0.1:5055
+        - name: SURREAL_COMMANDS_MAX_TASKS
+          value: "5"
+        - name: SURREAL_COMMANDS_RETRY_ENABLED
+          value: "true"
+        - name: SURREAL_COMMANDS_RETRY_MAX_ATTEMPTS
+          value: "3"
+        - name: SURREAL_COMMANDS_RETRY_WAIT_STRATEGY
+          value: exponential_jitter
+        - name: SURREAL_COMMANDS_RETRY_WAIT_MIN
+          value: "1"
+        - name: SURREAL_COMMANDS_RETRY_WAIT_MAX
+          value: "30"
+      instance:
+        type: free
