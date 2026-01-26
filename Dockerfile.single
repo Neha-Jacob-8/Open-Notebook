@@ -74,20 +74,6 @@ COPY --from=builder /app/frontend/.next/standalone /app/frontend/
 COPY --from=builder /app/frontend/.next/static /app/frontend/.next/static
 COPY --from=builder /app/frontend/public /app/frontend/public
 
-# Default PORT if not provided
-ENV PORT=8502
-
-# Expose ports for Frontend and API
-EXPOSE 8502 5055
-
-# Copy single-container supervisord configuration
-COPY supervisord.single.conf /app/supervisord.conf
-
-# Create log directories
-RUN mkdir -p /var/log/supervisor
-
-# Runtime API URL Configuration
-# The API_URL environment variable can be set at container runtime to configure
 # where the frontend should connect to the API. This allows the same Docker image
 # to work in different deployment scenarios without rebuilding.
 #
