@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: open-notebook
+    env: docker
+    dockerfilePath: ./Dockerfile.railway
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: SURREAL_URL
+        value: ws://127.0.0.1:8000/rpc
+      - key: SURREAL_USER
+        value: root
+      - key: SURREAL_PASSWORD
+        value: root
+      - key: SURREAL_NAMESPACE
+        value: test
+      - key: SURREAL_DATABASE
+        value: test
+      - key: INTERNAL_API_URL
+        value: http://127.0.0.1:5055
+      - key: API_URL
+        sync: false
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+      - key: SURREAL_COMMANDS_MAX_TASKS
+        value: 5
+      - key: SURREAL_COMMANDS_RETRY_ENABLED
+        value: true
+      - key: SURREAL_COMMANDS_RETRY_MAX_ATTEMPTS
+        value: 3
+      - key: SURREAL_COMMANDS_RETRY_WAIT_STRATEGY
+        value: exponential_jitter
+      - key: SURREAL_COMMANDS_RETRY_WAIT_MIN
+        value: 1
+      - key: SURREAL_COMMANDS_RETRY_WAIT_MAX
+        value: 30
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
