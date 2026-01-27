@@ -103,11 +103,24 @@ async function fetchConfig(): Promise<AppConfig> {
   }
 
   // Priority: Runtime config > Build-time env var > Smart default
-  const baseUrl = runtimeApiUrl || envApiUrl || defaultApiUrl
-  console.log('🔧 [Config] Final base URL to try:', baseUrl)
-  console.log('🔧 [Config] Selection priority: runtime=' + (runtimeApiUrl ? '✅' : '❌') +
+  // Note: Empty string '' is a valid value (means use relative URLs for tunnel/proxy setups)
+  let baseUrl: string
+  if (runtimeApiUrl !== null) {
+    // Runtime config was explicitly set (even if empty string)
+    baseUrl = runtimeApiUrl
+    console.log('🔧 [Config] Using runtime config:', baseUrl === '' ? '(empty - relative URLs)' : baseUrl)
+  } else if (envApiUrl) {
+    baseUrl = envApiUrl
+    console.log('🔧 [Config] Using build-time env var:', baseUrl)
+  } else {
+    baseUrl = defaultApiUrl
+    console.log('🔧 [Config] Using smart default:', baseUrl)
+  }
+  
+  console.log('🔧 [Config] Final base URL:', baseUrl === '' ? '(empty - relative URLs)' : baseUrl)
+  console.log('🔧 [Config] Selection priority: runtime=' + (runtimeApiUrl !== null ? '✅' : '❌') +
     ', build-time=' + (envApiUrl ? '✅' : '❌') +
-    ', smart-default=' + (!runtimeApiUrl && !envApiUrl ? '✅' : '❌'))
+    ', smart-default=' + (runtimeApiUrl === null && !envApiUrl ? '✅' : '❌'))
 
   try {
     console.log('🔧 [Config] Fetching backend config from:', `${baseUrl}/api/config`)

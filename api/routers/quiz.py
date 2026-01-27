@@ -106,7 +106,7 @@ class FlashcardResponse(BaseModel):
     front: str
     back: str
     tags: List[str]
-    difficulty: float
+    difficulty: Optional[float] = None
     state: int
     due: Optional[str]
     reps: int

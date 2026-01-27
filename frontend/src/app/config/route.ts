@@ -8,66 +8,35 @@ import { NextRequest, NextResponse } from 'next/server'
  *
  * Environment Variables:
  * - API_URL: Where the browser/client should make API requests (public/external URL)
+ *   - If empty or not set: Returns '' (empty string) so frontend uses relative /api/* paths
+ *   - If set to a URL: Returns that URL for direct API access
  * - INTERNAL_API_URL: Where Next.js server-side should proxy API requests (internal URL)
  *   Default: http://localhost:5055 (used by Next.js rewrites in next.config.ts)
  *
- * Why two different variables?
- * - API_URL: Used by browser clients, can be https://your-domain.com or http://server-ip:5055
- * - INTERNAL_API_URL: Used by Next.js rewrites for server-side proxying, typically http://localhost:5055
- *
- * Auto-detection logic for API_URL:
- * 1. If API_URL env var is set, use it (explicit override)
- * 2. Otherwise, detect from incoming HTTP request headers (zero-config)
- * 3. Fallback to localhost:5055 if detection fails
+ * For Cloudflare Tunnel / Reverse Proxy:
+ * - Leave API_URL empty so frontend uses relative URLs
+ * - Next.js rewrites will proxy /api/* to INTERNAL_API_URL
+ * - This works because the tunnel only exposes the frontend port (8080)
  *
  * This allows the same Docker image to work in different deployment scenarios.
  */
 export async function GET(request: NextRequest) {
-  // Priority 1: Check if API_URL is explicitly set
+  // Check if API_URL is explicitly set (and not empty)
   const envApiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
 
-  if (envApiUrl) {
+  if (envApiUrl && envApiUrl.trim() !== '') {
+    console.log('[runtime-config] Using explicit API_URL:', envApiUrl)
     return NextResponse.json({
       apiUrl: envApiUrl,
     })
   }
 
-  // Priority 2: Auto-detect from request headers
-  try {
-    // Get the protocol (http or https)
-    // Check X-Forwarded-Proto first (for reverse proxies), then fallback to request scheme
-    const proto = request.headers.get('x-forwarded-proto') ||
-      request.nextUrl.protocol.replace(':', '') ||
-      'http'
-
-    // Get the host header (includes port if non-standard)
-    const hostHeader = request.headers.get('host')
-
-    if (hostHeader) {
-      // Extract just the hostname (remove port if present)
-      let hostname = hostHeader.split(':')[0]
-
-      // Force 127.0.0.1 if localhost is detected to avoid IPv6 issues on Windows
-      if (hostname === 'localhost') {
-        hostname = '127.0.0.1'
-      }
-
-      // Construct the API URL with port 5055
-      const apiUrl = `${proto}://${hostname}:5055`
-
-      console.log(`[runtime-config] Auto-detected API URL: ${apiUrl} (proto=${proto}, host=${hostHeader})`)
-
-      return NextResponse.json({
-        apiUrl,
-      })
-    }
-  } catch (error) {
-    console.error('[runtime-config] Auto-detection failed:', error)
-  }
-
-  // Priority 3: Fallback to localhost
-  console.log('[runtime-config] Using fallback: http://127.0.0.1:5055')
+  // For Cloudflare Tunnel / reverse proxy setups, use empty string
+  // This tells the frontend to use relative URLs (/api/*) which Next.js rewrites will proxy
+  // This is the recommended setup for tunnels and reverse proxies
+  console.log('[runtime-config] Using relative API path (empty string) for tunnel/proxy compatibility')
   return NextResponse.json({
-    apiUrl: 'http://127.0.0.1:5055',
+    apiUrl: '',
   })
 }
+

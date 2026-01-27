@@ -41,6 +41,8 @@ dependencies = [
     "podcast-creator>=0.7.0",
     "surreal-commands>=1.2.0",
     "fsrs>=6.3.0",
+    "pytesseract>=0.3.10",
+    "Pillow>=10.0.0",
 ]
 
 [tool.setuptools]

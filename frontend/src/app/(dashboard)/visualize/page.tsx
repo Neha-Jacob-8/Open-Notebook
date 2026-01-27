@@ -30,15 +30,30 @@ export default function VisualizePage() {
 
         setIsGenerating(true)
         try {
-            // If a notebook is selected, we could fetch its context here
-            // For now, we'll just use the provided context or query
+            // If a notebook is selected, fetch its context from insights
+            let notebookContext = context || ""
+            
+            if (selectedNotebookId && !context) {
+                try {
+                    // Fetch insights from the selected notebook for context
+                    const insightsResponse = await fetch(`/api/insights/${selectedNotebookId}`)
+                    if (insightsResponse.ok) {
+                        const insights = await insightsResponse.json()
+                        if (insights && insights.content) {
+                            notebookContext = insights.content
+                        }
+                    }
+                } catch (err) {
+                    console.log('Could not fetch insights, using provided context')
+                }
+            }
 
             const response = await fetch('/api/diagrams/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     query,
-                    context: context || "No specific context provided, use general knowledge.",
+                    context: notebookContext || "No specific context provided, use general knowledge.",
                 }),
             })
 
@@ -87,7 +102,7 @@ export default function VisualizePage() {
                                     {notebooks && notebooks.length > 0 ? (
                                         notebooks.map((nb: any) => (
                                             <SelectItem key={nb.id} value={nb.id}>
-                                                {nb.title || 'Untitled Notebook'}
+                                                {nb.name || nb.title || 'Untitled Notebook'}
                                             </SelectItem>
                                         ))
                                     ) : (

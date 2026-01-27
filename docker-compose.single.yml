@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.single
     ports:
-      - "8502:8502"  # Next.js Frontend
+      - "8502:8080"  # Next.js Frontend (container port 8080 -> host port 8502)
       - "5055:5055"  # REST API
     env_file:
       - ./docker.env

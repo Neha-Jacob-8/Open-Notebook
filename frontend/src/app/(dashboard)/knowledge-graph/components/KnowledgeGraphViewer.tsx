@@ -29,7 +29,10 @@ import {
   Circle,
   ArrowRight,
   Search,
-  Sparkles
+  Sparkles,
+  Tags,
+  Eye,
+  EyeOff
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import type { GraphNode, GraphLink, NodeType } from '@/lib/types/knowledge-graph'
@@ -66,6 +69,7 @@ export function KnowledgeGraphViewer({ notebookId }: KnowledgeGraphViewerProps) 
   const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set())
   const [highlightLinks, setHighlightLinks] = useState<Set<string>>(new Set())
   const [hoverNode, setHoverNode] = useState<GraphNode | null>(null)
+  const [showAllLabels, setShowAllLabels] = useState<boolean>(true)  // Default to showing all labels
   const graphRef = useRef<any>(null)
 
   const { data: nodeDetails } = useNodeDetails(selectedNodeId)
@@ -131,10 +135,10 @@ export function KnowledgeGraphViewer({ notebookId }: KnowledgeGraphViewerProps) 
     }
 
     const label = node.label
-    const fontSize = Math.max(12 / globalScale, 5)
-    const baseNodeSize = 10  // Increased from 6 for better visibility
+    const fontSize = Math.max(14 / globalScale, 6)  // Increased font size
+    const baseNodeSize = 15  // Increased from 10 for much better visibility
     // Scale node size based on importance and mentions
-    const nodeSize = baseNodeSize + Math.sqrt(node.importance * 30 + node.mentions * 5)
+    const nodeSize = baseNodeSize + Math.sqrt(node.importance * 40 + node.mentions * 8)
 
     // Validate nodeSize is finite
     if (!Number.isFinite(nodeSize)) {
@@ -186,12 +190,16 @@ export function KnowledgeGraphViewer({ notebookId }: KnowledgeGraphViewerProps) 
     // Only show labels for:
     // - Hovered node
     // - Highlighted nodes (connected to hovered)
-    // - Very important concepts (>80% importance)
-    // - When significantly zoomed in
-    const shouldShowLabel = isHighlighted ||
+    // - Important concepts (>60% importance) - lowered threshold
+    // - When zoomed in moderately
+    // - Always show first 20 characters if zoomed in at all
+    // - When showAllLabels is enabled (default)
+    const shouldShowLabel = showAllLabels ||
+      isHighlighted ||
       hoverNode?.id === node.id ||
-      node.importance > 0.8 ||
-      globalScale > 2.5
+      node.importance > 0.6 ||
+      globalScale > 1.2 ||
+      node.mentions > 1
 
     if (shouldShowLabel) {
       // Enhanced label with better readability
@@ -248,7 +256,7 @@ export function KnowledgeGraphViewer({ notebookId }: KnowledgeGraphViewerProps) 
       ctx.textBaseline = 'middle'
       ctx.fillText(String(node.mentions), badgeX, badgeY)
     }
-  }, [highlightNodes])
+  }, [highlightNodes, showAllLabels, hoverNode])
 
   // Custom link rendering with relationship labels
   const linkCanvasObject = useCallback((link: GraphLink, ctx: CanvasRenderingContext2D, globalScale: number) => {
@@ -274,18 +282,18 @@ export function KnowledgeGraphViewer({ notebookId }: KnowledgeGraphViewerProps) 
     const angle = Math.atan2(dy, dx)
     const distance = Math.sqrt(dx * dx + dy * dy)
 
-    // Draw line with gradient
+    // Draw line with gradient - MUCH THICKER for visibility
     const gradient = ctx.createLinearGradient(source.x!, source.y!, target.x!, target.y!)
     if (isHighlighted) {
       gradient.addColorStop(0, '#60a5fa')
       gradient.addColorStop(1, '#a78bfa')
       ctx.strokeStyle = gradient
-      ctx.lineWidth = 2.5 / globalScale
+      ctx.lineWidth = 4 / globalScale  // Thicker highlighted links
     } else {
-      gradient.addColorStop(0, '#475569')
-      gradient.addColorStop(1, '#334155')
+      gradient.addColorStop(0, '#94a3b8')  // Lighter color for visibility
+      gradient.addColorStop(1, '#64748b')
       ctx.strokeStyle = gradient
-      ctx.lineWidth = 1 / globalScale
+      ctx.lineWidth = 2.5 / globalScale  // Much thicker normal links
     }
 
     ctx.beginPath()
@@ -329,9 +337,9 @@ export function KnowledgeGraphViewer({ notebookId }: KnowledgeGraphViewerProps) 
     ctx.fillStyle = isHighlighted ? '#ffffff' : '#64748b'
     ctx.fill()
 
-    // Draw relationship label when highlighted or zoomed in
-    if (isHighlighted || globalScale > 1.5) {
-      const fontSize = Math.max(10 / globalScale, 4)
+    // Draw relationship label - ALWAYS visible now for better understanding
+    if (showAllLabels || isHighlighted || globalScale > 1.0) {
+      const fontSize = Math.max(11 / globalScale, 5)  // Slightly larger font
       ctx.font = `500 ${fontSize}px Inter, sans-serif`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
@@ -369,7 +377,7 @@ export function KnowledgeGraphViewer({ notebookId }: KnowledgeGraphViewerProps) 
       ctx.fillStyle = isHighlighted ? '#ffffff' : '#cbd5e1'
       ctx.fillText(labelText, labelX, labelY)
     }
-  }, [highlightLinks])
+  }, [highlightLinks, showAllLabels])
 
   if (isLoading) {
     return (
@@ -473,6 +481,18 @@ export function KnowledgeGraphViewer({ notebookId }: KnowledgeGraphViewerProps) 
           {/* Zoom Controls */}
           <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
             <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant={showAllLabels ? "default" : "secondary"} 
+                    size="icon" 
+                    onClick={() => setShowAllLabels(!showAllLabels)}
+                  >
+                    {showAllLabels ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">{showAllLabels ? 'Hide Labels' : 'Show All Labels'}</TooltipContent>
+              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="secondary" size="icon" onClick={handleZoomIn}>
