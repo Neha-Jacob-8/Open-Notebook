@@ -45,6 +45,7 @@ import {
   ScanLine,
   CalendarDays,
   Sparkles,
+  Globe,
 } from 'lucide-react'
 
 const navigation = [
@@ -61,6 +62,7 @@ const navigation = [
       { name: 'Notebooks', href: '/notebooks', icon: Book },
       { name: 'Ask and Search', href: '/search', icon: Search },
       { name: 'Research Lab', href: '/research', icon: FlaskConical },
+      { name: 'Web Research', href: '/web-research', icon: Globe },
       { name: 'Visualize', href: '/visualize', icon: Sparkles },
     ],
   },

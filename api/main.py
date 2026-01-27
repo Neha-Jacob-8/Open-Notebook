@@ -35,6 +35,7 @@ from api.routers import (
     study_plans,
     transformations,
     diagrams,
+    web_research,
 )
 from api.routers import commands as commands_router
 from open_notebook.database.async_migrate import AsyncMigrationManager
@@ -130,6 +131,7 @@ app.include_router(monitoring.router, prefix="/api", tags=["monitoring"])
 app.include_router(ocr.router, prefix="/api", tags=["ocr"])
 app.include_router(study_plans.router, prefix="/api", tags=["study-plans"])
 app.include_router(diagrams.router, prefix="/api", tags=["diagrams"])
+app.include_router(web_research.router, prefix="/api", tags=["web-research"])
 
 
 @app.get("/")

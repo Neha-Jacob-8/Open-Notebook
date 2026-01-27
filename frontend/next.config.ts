@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Experimental features for longer timeouts on API proxy
+  experimental: {
+    proxyTimeout: 120000, // 2 minutes timeout for proxied requests
+  },
   // API Rewrites: Proxy /api/* requests to FastAPI backend
   // This simplifies reverse proxy configuration - users only need to proxy to port 8502
   // Next.js handles internal routing to the API backend on port 5055
